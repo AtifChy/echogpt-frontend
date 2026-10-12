@@ -184,10 +184,10 @@ export function SearchWorkspace({ user, onSignIn }: { user: User | null; onSignI
           </form>
 
           <div className="text-muted-foreground flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-2">
               <span className="inline-flex items-center gap-2">
-                <Icon icon={Shield01Icon} />
-                Safe search on
+                <Icon icon={Shield01Icon} size="20" />
+                Safe search
               </span>
               <label className="inline-flex items-center gap-2" htmlFor="search-freshness">
                 Published

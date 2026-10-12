@@ -9,7 +9,6 @@ import { Composer } from "@/components/composer";
 import { ErrorNotice } from "@/components/feedback";
 import { Icon } from "@/components/icon";
 import { PromptLibrary } from "@/components/prompt-library";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export function HomeWorkspace({
@@ -42,9 +41,6 @@ export function HomeWorkspace({
           <header className="flex flex-col items-center gap-5 text-center">
             <div className="flex flex-wrap items-center justify-center gap-3">
               <span className="type-eyebrow text-muted-foreground">Your space to think</span>
-              <Badge variant="outline" className="rounded-full">
-                Default model
-              </Badge>
             </div>
             <h1 className="type-display-hero max-w-full">
               {name ? `Where should we start, ${name}?` : "What can we work on?"}

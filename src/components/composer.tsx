@@ -112,10 +112,10 @@ export function Composer({
         </InputGroupAddon>
       </InputGroup>
       {!compact && (
-        <div className="type-caption text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+        <div className="type-caption text-muted-foreground flex flex-wrap items-center justify-between gap-2 px-2">
           <span>
             {webSearch
-              ? "Web search on · 2 requests per message"
+              ? "Web search · 2 requests per message"
               : "Uses your configured default AI model"}
           </span>
           <span>Shift + Enter for a new line</span>
