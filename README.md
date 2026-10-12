@@ -1,6 +1,8 @@
 # EchoGPT frontend
 
-A quiet workspace for AI conversations and web search, built on the existing Next.js template. The visual language follows `DESIGN.md`; the composer flow takes inspiration from the [Manus composer teardown](https://aiuxplayground.com/teardowns/manus/composer).
+A frontend for the EchoGPT NestJS backend, with AI conversations, web search, account settings, and administration.
+
+The project uses Next.js 16, React 19, TypeScript 6, Tailwind CSS 4, and shadcn Base UI components with Hugeicons. TanStack Query manages API data, Zustand manages workspace navigation, and tests run with Bun.
 
 ## Getting started
 
@@ -12,13 +14,19 @@ You need Bun, Node.js compatible with your installed Next.js version, and the Ec
    bun install
    ```
 
-2. Copy `.env.example` to `.env.local`. The default backend address is:
+2. Copy `.env.example` to `.env`. In PowerShell:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
+   The default backend address is:
 
    ```env
    BACKEND_API_URL=http://localhost:3010/api/v1
    ```
 
-3. Start PostgreSQL and the NestJS backend using the backend repository’s README. Before sending chat messages, sign in as an admin and use **Administration → AI providers** to add a provider, enable it, and make it the default. Web search also needs a valid Brave Search API key in the backend.
+3. Set up PostgreSQL, apply migrations, and seed roles using the backend repository's README. Set `PORT=3010` in the backend's `.env` before starting NestJS, since this frontend uses port 3000. Web search needs a valid Brave Search API key in the backend.
 
 4. Start the frontend:
 
@@ -30,12 +38,22 @@ You need Bun, Node.js compatible with your installed Next.js version, and the Ec
 
 The frontend uses port **3000** and connects to your backend on **3010**. API requests go through a Next.js server route; you do not need to change the backend’s browser CORS configuration for this frontend.
 
+### Configure an AI provider
+
+Before sending chat messages, an admin must configure an enabled default provider. If you do not have an admin account, register an account, then run this from the **backend repository** using that account's email:
+
+```bash
+bun run admin:promote -- your-email@example.com
+```
+
+Sign out and sign in again. Open **Administration → AI providers**, add a provider with its model and API key, enable it, and choose **Make default**. Provider keys are encrypted by the backend; they do not belong in the frontend environment file.
+
 ## What you can do
 
 - Register, sign in, and sign out.
 - Start a conversation using the backend’s default AI provider.
 - Send prompts, read responses, revisit conversations, and delete them.
-- Turn on web search in the composer to receive answers with sources.
+- Turn on web search in the composer to receive answers with sources, including when reopening saved conversations.
 - Search the web directly, filter by freshness, and revisit or clear search history.
 - Browse prompt starters for writing, research, coding, and everyday ideas.
 - Choose Light, Dark, or System appearance from the header menu. Light is the default for new visitors, and a saved choice is remembered.
@@ -54,11 +72,18 @@ The browser API client retries protected requests after one refresh rotation whe
 
 `BACKEND_API_URL` is a server-only setting. Do not put provider API keys, database credentials, or JWT signing secrets in the frontend.
 
+## Saved chat sources
+
+The chat endpoint returns `{ message }`, with citations in `message.sources`. Conversation history returns the same source metadata for each saved assistant message. The frontend reads those sources directly without running another search.
+
+Chat citations appear as compact numbered links. Expand the source list to see titles and domains. Direct web searches display source cards. Clearing search history does not remove citations attached to saved chat messages.
+
+Messages created before the backend started saving citations may have no sources. Those citations cannot be recovered automatically.
+
 ## Current scope
 
 - **Per-chat provider selection is deferred.** New conversations use the enabled default provider configured in Administration. Existing conversations retain their provider. New providers start disabled; enable one before selecting **Make default**. Provider types cannot be changed after creation, and blank API keys in the edit form preserve the saved key.
-- Conversation titles are derived from prompts during the current browser session. After reload, conversations may use their numeric IDs because the backend has no title field.
-- Chat sources use compact numbered links, expandable into a full source list. The frontend prefers saved `message.sources` returned by conversation history. The current backend does not yet persist citations; follow `docs/persist-chat-sources.md` in the backend repository to enable that. Citations never stored for older messages cannot be recovered automatically.
+- Conversation titles are derived from prompts during the current browser session. The backend now has a `title` field, but the conversation-list endpoint does not return it and automatic naming is not connected. After reload, the sidebar falls back to labels such as `Conversation 1`.
 - Responses arrive as complete messages. The backend does not currently offer streaming.
 - A conversation can display previous messages, but the current backend sends only the latest prompt to the AI provider. Multi-turn context needs a backend change.
 - Plan changes are managed by admins. There is no payment or self-service checkout.
@@ -83,7 +108,7 @@ The visual source of truth is `DESIGN.md`. Layouts use Tailwind v4; controls, fo
 bun run dev        # Development server on port 3000
 bun run lint       # ESLint
 bun run typecheck  # TypeScript checks
-bun run test       # API client and server-proxy tests; no database needed
+bun run test       # Bun tests for API, providers, and rendering; no database needed
 bun run fmt        # Format files
 bun run fmt:check  # Check formatting
 bun run build     # Production build
@@ -93,6 +118,13 @@ bun run start      # Serve the production build on port 3000
 To use a different port, append `--port <number>` to `bun run dev` or `bun run start`.
 
 The tests use mocked HTTP responses and static React rendering. They cover cookie handling, token refresh, request restrictions, provider routes and form validation, Markdown/source rendering safety, and session clearing. They do not call paid AI APIs or change your database.
+
+Build before starting the production server:
+
+```bash
+bun run build
+bun run start
+```
 
 ## Project structure
 
@@ -127,9 +159,10 @@ src/
     ├── backend-proxy.ts               Cookie and upstream request handling
     ├── prompts.ts                     Prompt starter content
     ├── providers.ts                   Provider choices and form validation
+    ├── sources.ts                     Safe source URLs and domain labels
     ├── types.ts                       API response types
     └── workspace-store.ts             UI navigation state
-test/                                  API and authentication boundary tests
+test/                                  Bun API, provider, and rendering tests
 ```
 
 ## Troubleshooting
@@ -139,5 +172,7 @@ test/                                  API and authentication boundary tests
 **No default provider configured:** Sign in as an admin, open **Administration → AI providers**, add a provider with a valid API key, choose **Enable**, then **Make default**. The backend Swagger UI remains an alternative.
 
 **Web search fails:** Check the backend’s Brave Search API key and quota. The frontend shows the error returned by the backend.
+
+**Sources disappear after reopening a conversation:** Check that the backend database has the `MessageSource` table and that the conversation-messages response includes `sources` on each message. Older messages saved without citations will still have no sources.
 
 **Password changed:** All backend sessions are revoked. Sign in again using the new password.
