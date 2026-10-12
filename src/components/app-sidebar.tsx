@@ -73,7 +73,7 @@ export function AppSidebar({
   busy: boolean;
   loggingOut: boolean;
 }) {
-  const { view, conversationId, titles } = useWorkspace();
+  const { view, conversationId } = useWorkspace();
   const { setOpenMobile, state, isMobile } = useSidebar();
   const iconOnly = state === "collapsed" && !isMobile;
   const [filterOpen, setFilterOpen] = useState(false);
@@ -84,7 +84,7 @@ export function AppSidebar({
   };
   const name = user?.displayName || user?.email.split("@")[0] || "Your workspace";
   const visible = (conversations || []).filter((item) =>
-    (titles[item.id] || `Conversation ${item.id}`).toLowerCase().includes(filter.toLowerCase()),
+    (item.title || "New Conversation").toLowerCase().includes(filter.toLowerCase()),
   );
   const navigation = [
     { view: "chat" as const, label: "Conversations", icon: AiChat02Icon },
@@ -185,13 +185,13 @@ export function AppSidebar({
                 {visible.map((item) => (
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton
-                      tooltip={titles[item.id] || `Conversation ${item.id}`}
+                      tooltip={item.title || "New Conversation"}
                       isActive={conversationId === item.id && view === "chat"}
                       disabled={busy}
                       onClick={() => closeAnd(() => onConversation(item.id))}
                     >
                       <Icon icon={AiChat02Icon} />
-                      <span>{titles[item.id] || `Conversation ${item.id}`}</span>
+                      <span>{item.title || "New Conversation"}</span>
                     </SidebarMenuButton>
                     <SidebarMenuAction
                       showOnHover

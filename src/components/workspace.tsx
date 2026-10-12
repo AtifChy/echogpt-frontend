@@ -114,11 +114,17 @@ function WorkspaceContent() {
     }) => {
       let id = input.conversationId;
       if (!id) {
-        const created = await api<Conversation>("conversations", { method: "POST", body: "{}" });
+        const title = input.prompt.trim().replace(/\s+/g, " ").slice(0, 60);
+
+        const created = await api<Conversation>("conversations", {
+          method: "POST",
+          body: JSON.stringify({ title }),
+        });
+
         id = created.id;
         queryClient.setQueryData(["messages", user?.id, id], []);
         workspace.openConversation(id);
-        workspace.setTitle(id, input.prompt);
+
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       }
       const response = await api<{ message: Message }>("chat/messages", {
@@ -257,9 +263,7 @@ function WorkspaceContent() {
           ? "Prompt library"
           : "Administration";
   const conversationTitle =
-    workspace.titles[workspace.conversationId!] ||
-    messages.data?.find((message) => message.role === "USER")?.content.slice(0, 60) ||
-    `Conversation ${workspace.conversationId}`;
+    conversations.data?.find((c) => c.id === workspace.conversationId)?.title ?? "New conversation";
 
   return (
     <>

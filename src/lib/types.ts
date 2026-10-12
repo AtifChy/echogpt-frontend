@@ -23,6 +23,7 @@ export interface User {
 
 export interface Conversation {
   id: number;
+  title: string;
   providerId: number;
   createdAt: string;
   updatedAt: string;
