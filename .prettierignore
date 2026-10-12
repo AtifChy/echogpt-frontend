@@ -1,0 +1,4 @@
+# Keep upstream component and installed skill formatting unchanged.
+src/components/ui/
+.agents/
+bun.lock
