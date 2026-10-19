@@ -16,7 +16,7 @@ export interface User {
   id: number;
   email: string;
   displayName: string | null;
-  role: { name: UserRole };
+  role: UserRole;
   status: "ACTIVE" | "SUSPENDED";
   createdAt: string;
 }

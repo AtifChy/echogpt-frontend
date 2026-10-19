@@ -435,9 +435,7 @@ function WorkspaceContent() {
               <PromptLibrary full onSelect={selectPrompt} />
             </div>
           )}
-          {workspace.view === "admin" && user?.role.name === "ADMIN" && (
-            <AdminWorkspace user={user} />
-          )}
+          {workspace.view === "admin" && user?.role === "ADMIN" && <AdminWorkspace user={user} />}
         </div>
       </SidebarInset>
       <AuthDialog

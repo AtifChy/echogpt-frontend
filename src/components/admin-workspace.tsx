@@ -163,7 +163,7 @@ export function AdminWorkspace({ user }: { user: User }) {
       : ["Request", "User", "Operation", "Status", "Latency", "Created"];
 
   const recordsPanel = activeQuery.isPending ? (
-    <Table aria-label="Loading records" aria-busy className="min-w-[40rem]">
+    <Table aria-label="Loading records" aria-busy className="min-w-160">
       <TableHeader>
         <TableRow>
           {columns.map((column) => (
@@ -191,7 +191,7 @@ export function AdminWorkspace({ user }: { user: User }) {
     />
   ) : tab === "users" ? (
     users.data?.length ? (
-      <Table aria-label="User accounts" className="min-w-[40rem]">
+      <Table aria-label="User accounts" className="min-w-160">
         <TableHeader>
           <TableRow>
             <TableHead>Person</TableHead>
@@ -218,7 +218,7 @@ export function AdminWorkspace({ user }: { user: User }) {
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{person.role.name === "ADMIN" ? "Admin" : "User"}</Badge>
+                <Badge variant="outline">{person.role === "ADMIN" ? "Admin" : "User"}</Badge>
               </TableCell>
               <TableCell>
                 {person.subscriptions ? (
@@ -287,7 +287,7 @@ export function AdminWorkspace({ user }: { user: User }) {
       />
     )
   ) : logs.data?.length ? (
-    <Table aria-label="API request logs" className="min-w-[44rem]">
+    <Table aria-label="API request logs" className="min-w-176">
       <TableHeader>
         <TableRow>
           <TableHead>Request</TableHead>

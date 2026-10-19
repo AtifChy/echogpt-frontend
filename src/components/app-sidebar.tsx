@@ -90,7 +90,7 @@ export function AppSidebar({
     { view: "chat" as const, label: "Conversations", icon: AiChat02Icon },
     { view: "search" as const, label: "Web search", icon: Globe02Icon },
     { view: "library" as const, label: "Prompt library", icon: BookOpen01Icon },
-    ...(user?.role.name === "ADMIN"
+    ...(user?.role === "ADMIN"
       ? [{ view: "admin" as const, label: "Administration", icon: DashboardSquare01Icon }]
       : []),
   ];
